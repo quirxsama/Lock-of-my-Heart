@@ -38,7 +38,7 @@ body {
     justify-content: center;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.8s ease-in-out;
+    transition: opacity 0.8s ease-in-out, visibility 0.8s;
     z-index: 1;
 }
 
@@ -67,85 +67,56 @@ body {
 .locked-heart {
     position: relative;
     margin-bottom: 100px;
+    cursor: pointer;
 }
 
 .heart-shape {
-    width: 120px;
-    height: 120px;
     position: relative;
-    transform: rotate(-45deg);
-    background: #e74c3c;
-    border-radius: 50px 50px 0 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 10px 30px rgba(231, 76, 60, 0.3);
-}
-
-.heart-shape:before,
-.heart-shape:after {
-    content: '';
-    width: 120px;
-    height: 120px;
-    position: absolute;
-    background: #e74c3c;
-    border-radius: 50px;
-    top: -60px;
-    left: 0;
-}
-
-.heart-shape:after {
-    left: 60px;
-    top: 0;
+    font-size: 150px;
+    color: #e74c3c;
+    text-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
+    transition: transform 0.4s ease;
 }
 
 .lock-icon {
-    font-size: 40px;
-    transform: rotate(45deg);
-    z-index: 5;
-    position: relative;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 50px;
+    color: #fff;
+    text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    transition: all 0.4s ease;
 }
 
 .chains {
     position: absolute;
-    top: 100%;
+    bottom: -60px;
     left: 50%;
     transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
 }
 
 .chain {
     width: 8px;
-    height: 60px;
+    height: 80px;
     background: #34495e;
-    margin: 0 10px;
-    display: inline-block;
     border-radius: 4px;
-    position: relative;
     box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
-}
-
-.chain:before {
-    content: '';
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 20px;
-    height: 20px;
-    border: 4px solid #34495e;
-    border-radius: 50%;
-    background: transparent;
 }
 
 .key-container {
     text-align: center;
+    position: absolute;
+    bottom: 15%;
 }
 
 .key-icon {
-    font-size: 60px;
+    font-size: 70px;
+    color: #ffd700;
     cursor: grab;
     transition: transform 0.3s ease;
-    display: inline-block;
     filter: drop-shadow(0 5px 15px rgba(255, 215, 0, 0.5));
 }
 
@@ -164,7 +135,7 @@ body {
 
 /* Ana Ekran Stilleri */
 #main-screen {
-    background: linear-gradient(to bottom, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+    background: #000;
 }
 
 .night-sky {
@@ -174,6 +145,7 @@ body {
     width: 100%;
     height: 100%;
     overflow: hidden;
+    background: linear-gradient(to bottom, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
 }
 
 .main-content {
@@ -209,10 +181,6 @@ body {
     box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
 }
 
-.ok-button:active {
-    transform: translateY(0);
-}
-
 /* Evren Ekranı */
 #universe-screen {
     background: #000;
@@ -226,9 +194,60 @@ body {
     cursor: grab;
 }
 
-.universe-container:active {
-    cursor: grabbing;
+#space-elements {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform-origin: center;
+    will-change: transform;
 }
+
+.space-element.star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle 4s ease-in-out infinite alternate;
+}
+
+#heart-universe {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 500px;
+    height: 500px;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 2s ease-in-out 1s;
+}
+
+#heart-universe.visible {
+    opacity: 1;
+}
+
+#heart-universe::before,
+#heart-universe::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 250px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255, 107, 107, 0.5) 0%, rgba(231, 76, 60, 0.2) 40%, transparent 70%);
+    border-radius: 250px 250px 0 0;
+    transform-origin: bottom center;
+    filter: blur(5px);
+}
+
+#heart-universe::before {
+    left: 125px;
+    transform: rotate(-45deg);
+}
+
+#heart-universe::after {
+    left: -125px;
+    transform: rotate(45deg);
+}
+
 
 .zoom-instruction {
     position: absolute;
@@ -245,12 +264,11 @@ body {
     background: rgba(0, 0, 0, 0.5);
     padding: 10px 20px;
     border-radius: 20px;
-    backdrop-filter: blur(10px);
 }
 
 /* Mesaj Ekranı */
 #message-screen {
-    background: linear-gradient(45deg, #667eea, #764ba2);
+    background: linear-gradient(45deg, #1a1a2e, #16213e);
 }
 
 .message-container {
@@ -262,7 +280,7 @@ body {
     font-size: 42px;
     font-weight: 600;
     text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-    animation: pulse 2s infinite;
+    animation: pulse 2.5s infinite;
 }
 
 /* Final Ekranı */
@@ -285,83 +303,35 @@ body {
 
 /* Responsive Tasarım */
 @media (max-width: 768px) {
-    .main-title {
-        font-size: 36px;
-        margin-bottom: 30px;
-    }
-    
-    .ok-button {
-        padding: 12px 30px;
-        font-size: 20px;
-    }
-    
-    .message-text {
-        font-size: 32px;
-    }
-    
-    .final-message {
-        font-size: 42px;
-    }
-    
-    .instruction {
-        font-size: 20px;
-    }
-    
-    .heart-shape {
-        width: 100px;
-        height: 100px;
-    }
-    
-    .heart-shape:before,
-    .heart-shape:after {
-        width: 100px;
-        height: 100px;
-    }
-    
-    .heart-shape:before {
-        top: -50px;
-    }
-    
-    .heart-shape:after {
-        left: 50px;
-    }
-    
-    .lock-icon {
-        font-size: 32px;
-    }
-    
-    .key-icon {
-        font-size: 50px;
-    }
+    .main-title { font-size: 36px; }
+    .ok-button { padding: 12px 30px; font-size: 20px; }
+    .message-text { font-size: 32px; }
+    .final-message { font-size: 42px; }
+    .instruction { font-size: 20px; }
+    .heart-shape { font-size: 120px; }
+    .lock-icon { font-size: 40px; }
+    .key-icon { font-size: 60px; }
+    #heart-universe { width: 300px; height: 300px; }
+    #heart-universe::before, #heart-universe::after { width: 150px; height: 240px; }
+    #heart-universe::before { left: 75px; }
+    #heart-universe::after { left: -75px; }
+
 }
 
 @media (max-width: 480px) {
-    .main-title {
-        font-size: 28px;
-    }
-    
-    .message-text {
-        font-size: 24px;
-    }
-    
-    .final-message {
-        font-size: 32px;
-    }
-    
-    .zoom-instruction p {
-        font-size: 14px;
-        padding: 8px 16px;
-    }
+    .main-title { font-size: 28px; }
+    .message-text { font-size: 24px; }
+    .final-message { font-size: 32px; }
+    .zoom-instruction p { font-size: 14px; padding: 8px 16px; }
 }
 
 /* Temel Animasyonlar */
 @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.05); opacity: 1; }
 }
 
 @keyframes finalGlow {
-    0% { text-shadow: 0 0 30px rgba(255, 107, 107, 0.8); }
-    100% { text-shadow: 0 0 50px rgba(255, 107, 107, 1), 0 0 80px rgba(255, 107, 107, 0.6); }
+    from { text-shadow: 0 0 30px rgba(255, 107, 107, 0.7); }
+    to { text-shadow: 0 0 50px rgba(255, 107, 107, 1), 0 0 80px rgba(255, 107, 107, 0.5); }
 }
-
