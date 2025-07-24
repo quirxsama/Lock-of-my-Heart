@@ -1,73 +1,86 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Screen elements
+    // --- DOM Elements ---
     const introScreen = document.getElementById('intro-screen');
     const mainScreen = document.getElementById('main-screen');
     const universeScreen = document.getElementById('universe-screen');
     const messageScreen = document.getElementById('message-screen');
     const finalScreen = document.getElementById('final-screen');
 
-    // Intro screen elements
     const keyIcon = document.getElementById('key-icon');
     const lockedHeart = document.getElementById('locked-heart');
-
-    // Button elements
     const okButton = document.getElementById('ok-button');
 
-    // Universe elements
     const universeContainer = document.getElementById('universe-container');
     const spaceElements = document.getElementById('space-elements');
     const heartUniverse = document.getElementById('heart-universe');
-    
+    const messageText = document.getElementById('message-text');
+    const finalMessage = document.querySelector('.final-message');
+
+    // --- State Variables ---
     let isDragging = false;
-    let offsetX, offsetY;
     let isUnlocked = false;
+    let offsetX, offsetY;
 
-    // --- Drag and Drop Logic ---
+    // --- Core Functions ---
 
+    /**
+     * Transitions between screens with fade effects.
+     * @param {HTMLElement} fromScreen - The screen to hide.
+     * @param {HTMLElement} toScreen - The screen to show.
+     */
+    const transitionScreen = (fromScreen, toScreen) => {
+        fromScreen.classList.remove('active');
+        toScreen.classList.add('active');
+    };
+
+    /**
+     * Initializes the drag-and-drop functionality for the key.
+     */
     const startDrag = (e) => {
         if (isUnlocked) return;
         isDragging = true;
-
-        keyIcon.style.position = 'absolute';
-        keyIcon.style.cursor = 'grabbing';
         
-        // Consistently use clientX/Y for both mouse and touch events
+        keyIcon.style.position = 'fixed';
+        keyIcon.style.cursor = 'grabbing';
+        keyIcon.style.zIndex = '1001';
+
         const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
         const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
-
+        
         const rect = keyIcon.getBoundingClientRect();
         offsetX = clientX - rect.left;
         offsetY = clientY - rect.top;
 
-        // Add listeners to the whole document to allow dragging outside the initial element
         document.addEventListener('mousemove', dragKey);
         document.addEventListener('touchmove', dragKey, { passive: false });
         document.addEventListener('mouseup', stopDrag);
         document.addEventListener('touchend', stopDrag);
     };
 
+    /**
+     * Handles the movement of the key during dragging.
+     */
     const dragKey = (e) => {
         if (!isDragging) return;
-        e.preventDefault(); // Prevent scrolling on touch devices
+        e.preventDefault();
 
-        // Consistently use clientX/Y for both mouse and touch events
         const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
         const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
 
-        // Check if clientX/Y are valid numbers before applying
-        if (typeof clientX === 'number' && typeof clientY === 'number') {
-            keyIcon.style.left = `${clientX - offsetX}px`;
-            keyIcon.style.top = `${clientY - offsetY}px`;
-            checkCollision();
-        }
+        keyIcon.style.left = `${clientX - offsetX}px`;
+        keyIcon.style.top = `${clientY - offsetY}px`;
+
+        checkCollision();
     };
 
+    /**
+     * Ends the dragging process and cleans up event listeners.
+     */
     const stopDrag = () => {
         if (!isDragging) return;
         isDragging = false;
         keyIcon.style.cursor = 'grab';
 
-        // Reset position if not unlocked
         if (!isUnlocked) {
             keyIcon.style.position = 'relative';
             keyIcon.style.left = 'auto';
@@ -80,76 +93,57 @@ document.addEventListener('DOMContentLoaded', () => {
         document.removeEventListener('touchend', stopDrag);
     };
 
+    /**
+     * Checks if the key is colliding with the heart.
+     */
     const checkCollision = () => {
         const keyRect = keyIcon.getBoundingClientRect();
         const heartRect = lockedHeart.getBoundingClientRect();
 
-        const isColliding = !(
-            keyRect.right < heartRect.left ||
-            keyRect.left > heartRect.right ||
-            keyRect.bottom < heartRect.top ||
-            keyRect.top > heartRect.bottom
-        );
-
-        if (isColliding) {
+        if (keyRect.left < heartRect.right &&
+            keyRect.right > heartRect.left &&
+            keyRect.top < heartRect.bottom &&
+            keyRect.bottom > heartRect.top) {
             unlockHeart();
         }
     };
 
+    /**
+     * Handles the unlocking animation and screen transition.
+     */
     const unlockHeart = () => {
         if (isUnlocked) return;
         isUnlocked = true;
-        isDragging = false; // Stop dragging logic
+        isDragging = false;
 
         lockedHeart.classList.add('unlocked');
-        
-        keyIcon.style.transition = 'opacity 0.5s, transform 0.5s';
         keyIcon.style.opacity = '0';
-        keyIcon.style.transform = 'scale(0)';
 
-        // Transition to next screen after animation
         setTimeout(() => {
-            introScreen.classList.remove('active');
-            mainScreen.classList.add('active');
-        }, 1500); // Wait for heart unlock animation
+            transitionScreen(introScreen, mainScreen);
+        }, 1200);
     };
-
-    keyIcon.addEventListener('mousedown', startDrag);
-    keyIcon.addEventListener('touchstart', startDrag, { passive: false });
-
-
-    // --- Screen Navigation ---
     
-    okButton.addEventListener('click', () => {
-        mainScreen.classList.remove('active');
-        universeScreen.classList.add('active');
-        initUniverse();
-    });
-    
-    // --- Universe Logic ---
-
+    /**
+     * Initializes the universe exploration screen.
+     */
     const initUniverse = () => {
         let scale = 1;
-        let panX = 0;
-        let panY = 0;
-        let isPanning = false;
-        let lastPanX, lastPanY;
+        let panX = 0, panY = 0;
+        let isPanning = false, lastPanX, lastPanY;
         let lastTouchDistance = 0;
         let heartRevealed = false;
-
-        // Clear previous elements if any
-        spaceElements.innerHTML = '';
         
-        // Create stars
+        spaceElements.innerHTML = '';
         for (let i = 0; i < 200; i++) {
-            const element = document.createElement('div');
-            element.className = 'space-element star';
+            const star = document.createElement('div');
+            star.className = 'space-element star';
             const size = Math.random() * 3 + 1;
-            element.style.width = `${size}px`;
-            element.style.height = `${size}px`;
-            element.style.left = `${Math.random() * 200 - 50}%`;
-            element.style.top = `${Math.random() * 200 - 50}%`;
-            spaceElements.appendChild(element);
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+            star.style.left = `${Math.random() * 150 - 25}%`; // Spread stars wider
+            star.style.top = `${Math.random() * 150 - 25}%`;
+            spaceElements.appendChild(star);
         }
 
         const updateTransform = () => {
@@ -181,71 +175,83 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const handleZoom = (e) => {
             e.preventDefault();
-            scale += e.deltaY * -0.001;
-            scale = Math.min(Math.max(0.1, scale), 3);
+            scale += e.deltaY * -0.001; // For mouse wheel
+            scale = Math.min(Math.max(0.1, scale), 2);
             updateTransform();
-            if (scale < 0.25 && !heartRevealed) {
-                revealHeart();
-            }
+            if (scale < 0.25 && !heartRevealed) revealHeart();
         };
 
-        const getTouchDistance = (touches) => {
-            const dx = touches[0].clientX - touches[1].clientX;
-            const dy = touches[0].clientY - touches[1].clientY;
-            return Math.sqrt(dx * dx + dy * dy);
+        const handleTouchZoom = (e) => {
+            if (e.touches.length !== 2) return;
+            const currentDistance = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+            const scaleChange = currentDistance / lastTouchDistance;
+            scale *= scaleChange;
+            scale = Math.min(Math.max(0.1, scale), 2);
+            updateTransform();
+            lastTouchDistance = currentDistance;
+            if (scale < 0.25 && !heartRevealed) revealHeart();
         };
 
         const touchStart = (e) => {
-            if (e.touches.length === 1) {
-                startPan(e);
-            } else if (e.touches.length === 2) {
+            if (e.touches.length === 1) startPan(e);
+            else if (e.touches.length === 2) {
                 isPanning = false;
-                lastTouchDistance = getTouchDistance(e.touches);
-            }
-        };
-
-        const touchMove = (e) => {
-            e.preventDefault();
-            if (e.touches.length === 1 && isPanning) {
-                movePan(e);
-            } else if (e.touches.length === 2) {
-                const currentDistance = getTouchDistance(e.touches);
-                const scaleChange = currentDistance / lastTouchDistance;
-                scale *= scaleChange;
-                scale = Math.min(Math.max(0.1, scale), 3);
-                updateTransform();
-                lastTouchDistance = currentDistance;
-                if (scale < 0.25 && !heartRevealed) {
-                    revealHeart();
-                }
+                lastTouchDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
             }
         };
 
         const revealHeart = () => {
             heartRevealed = true;
             heartUniverse.classList.add('visible');
-            
+
+            // Start the final sequence
             setTimeout(() => {
-                universeScreen.classList.remove('active');
-                messageScreen.classList.add('active');
+                transitionScreen(universeScreen, messageScreen);
                 
+                // After message is shown, trigger explosion and final screen
                 setTimeout(() => {
-                    messageScreen.classList.remove('active');
-                    finalScreen.classList.add('active');
-                    document.getElementById('message-text').textContent = "Seni seviyorum Rüya";
-                }, 4000);
+                    const explosion = document.createElement('div');
+                    explosion.className = 'explosion';
+                    messageScreen.appendChild(explosion);
 
-            }, 3000);
+                    setTimeout(() => {
+                        finalMessage.textContent = 'Seni seviyorum Rüya';
+                        transitionScreen(messageScreen, finalScreen);
+                        explosion.remove(); // Clean up the explosion element
+                    }, 1000); // Wait for explosion animation
+
+                }, 2500); // Time for user to read the message
+
+            }, 2000); // Time for user to see the heart universe
         };
-
-        // Add universe event listeners
+        
+        // --- Universe Event Listeners ---
         universeContainer.addEventListener('mousedown', startPan);
         universeContainer.addEventListener('mousemove', movePan);
         universeContainer.addEventListener('mouseup', stopPan);
         universeContainer.addEventListener('mouseleave', stopPan);
-        universeContainer.addEventListener('wheel', handleZoom);
+        universeContainer.addEventListener('wheel', handleZoom, { passive: false });
         universeContainer.addEventListener('touchstart', touchStart, { passive: false });
-        universeContainer.addEventListener('touchmove', touchMove, { passive: false });
+        universeContainer.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (e.touches.length === 1 && isPanning) movePan(e);
+            else if (e.touches.length === 2) handleTouchZoom(e);
+        }, { passive: false });
         universeContainer.addEventListener('touchend', stopPan);
     };
+
+    // --- Initial Event Listeners ---
+    keyIcon.addEventListener('mousedown', startDrag);
+    keyIcon.addEventListener('touchstart', startDrag, { passive: false });
+
+    okButton.addEventListener('click', () => {
+        transitionScreen(mainScreen, universeScreen);
+        initUniverse();
+    });
 });
