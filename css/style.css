@@ -1,0 +1,367 @@
+/* CSS Reset ve Temel Ayarlar */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Dancing Script', cursive;
+    background: #0a0a0a;
+    color: #fff;
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* iOS Safari özel ayarları */
+body {
+    -webkit-overflow-scrolling: touch;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Ekran Yönetimi */
+.screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.8s ease-in-out;
+    z-index: 1;
+}
+
+.screen.active {
+    opacity: 1;
+    visibility: visible;
+    z-index: 10;
+}
+
+/* Giriş Ekranı Stilleri */
+#intro-screen {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.intro-container {
+    text-align: center;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.locked-heart {
+    position: relative;
+    margin-bottom: 100px;
+}
+
+.heart-shape {
+    width: 120px;
+    height: 120px;
+    position: relative;
+    transform: rotate(-45deg);
+    background: #e74c3c;
+    border-radius: 50px 50px 0 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(231, 76, 60, 0.3);
+}
+
+.heart-shape:before,
+.heart-shape:after {
+    content: '';
+    width: 120px;
+    height: 120px;
+    position: absolute;
+    background: #e74c3c;
+    border-radius: 50px;
+    top: -60px;
+    left: 0;
+}
+
+.heart-shape:after {
+    left: 60px;
+    top: 0;
+}
+
+.lock-icon {
+    font-size: 40px;
+    transform: rotate(45deg);
+    z-index: 5;
+    position: relative;
+}
+
+.chains {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.chain {
+    width: 8px;
+    height: 60px;
+    background: #34495e;
+    margin: 0 10px;
+    display: inline-block;
+    border-radius: 4px;
+    position: relative;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+}
+
+.chain:before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 20px;
+    border: 4px solid #34495e;
+    border-radius: 50%;
+    background: transparent;
+}
+
+.key-container {
+    text-align: center;
+}
+
+.key-icon {
+    font-size: 60px;
+    cursor: grab;
+    transition: transform 0.3s ease;
+    display: inline-block;
+    filter: drop-shadow(0 5px 15px rgba(255, 215, 0, 0.5));
+}
+
+.key-icon:active {
+    cursor: grabbing;
+    transform: scale(1.1);
+}
+
+.instruction {
+    margin-top: 20px;
+    font-size: 24px;
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    font-weight: 500;
+}
+
+/* Ana Ekran Stilleri */
+#main-screen {
+    background: linear-gradient(to bottom, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+}
+
+.night-sky {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.main-content {
+    text-align: center;
+    z-index: 5;
+    position: relative;
+}
+
+.main-title {
+    font-size: 48px;
+    font-weight: 600;
+    margin-bottom: 50px;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    color: #fff;
+}
+
+.ok-button {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+    border: none;
+    padding: 15px 40px;
+    font-size: 24px;
+    font-family: 'Dancing Script', cursive;
+    font-weight: 600;
+    color: white;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
+}
+
+.ok-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+}
+
+.ok-button:active {
+    transform: translateY(0);
+}
+
+/* Evren Ekranı */
+#universe-screen {
+    background: #000;
+}
+
+.universe-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    cursor: grab;
+}
+
+.universe-container:active {
+    cursor: grabbing;
+}
+
+.zoom-instruction {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 10;
+}
+
+.zoom-instruction p {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px 20px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+}
+
+/* Mesaj Ekranı */
+#message-screen {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+}
+
+.message-container {
+    text-align: center;
+    padding: 20px;
+}
+
+.message-text {
+    font-size: 42px;
+    font-weight: 600;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    animation: pulse 2s infinite;
+}
+
+/* Final Ekranı */
+#final-screen {
+    background: linear-gradient(to bottom, #0c0c0c, #1a1a2e);
+}
+
+.final-container {
+    text-align: center;
+    position: relative;
+}
+
+.final-message {
+    font-size: 56px;
+    font-weight: 700;
+    color: #ff6b6b;
+    text-shadow: 0 0 30px rgba(255, 107, 107, 0.8);
+    animation: finalGlow 3s ease-in-out infinite alternate;
+}
+
+/* Responsive Tasarım */
+@media (max-width: 768px) {
+    .main-title {
+        font-size: 36px;
+        margin-bottom: 30px;
+    }
+    
+    .ok-button {
+        padding: 12px 30px;
+        font-size: 20px;
+    }
+    
+    .message-text {
+        font-size: 32px;
+    }
+    
+    .final-message {
+        font-size: 42px;
+    }
+    
+    .instruction {
+        font-size: 20px;
+    }
+    
+    .heart-shape {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .heart-shape:before,
+    .heart-shape:after {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .heart-shape:before {
+        top: -50px;
+    }
+    
+    .heart-shape:after {
+        left: 50px;
+    }
+    
+    .lock-icon {
+        font-size: 32px;
+    }
+    
+    .key-icon {
+        font-size: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-title {
+        font-size: 28px;
+    }
+    
+    .message-text {
+        font-size: 24px;
+    }
+    
+    .final-message {
+        font-size: 32px;
+    }
+    
+    .zoom-instruction p {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+}
+
+/* Temel Animasyonlar */
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes finalGlow {
+    0% { text-shadow: 0 0 30px rgba(255, 107, 107, 0.8); }
+    100% { text-shadow: 0 0 50px rgba(255, 107, 107, 1), 0 0 80px rgba(255, 107, 107, 0.6); }
+}
+

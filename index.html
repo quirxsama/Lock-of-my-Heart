@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-title" content="Sana Olan Aşkım">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/icon-180.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="assets/images/icon-152.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="assets/images/icon-120.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/icon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/icon-16.png">
+    <title>Sana Olan Aşkım</title>
+    
+    <!-- Google Fonts - El yazısı font -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+    <!-- Giriş Ekranı - Anahtar ve Kilit -->
+    <div id="intro-screen" class="screen active">
+        <div class="intro-container">
+            <div class="locked-heart" id="locked-heart">
+                <div class="heart-shape">
+                    <div class="lock-icon">🔒</div>
+                </div>
+                <div class="chains">
+                    <div class="chain chain-1"></div>
+                    <div class="chain chain-2"></div>
+                    <div class="chain chain-3"></div>
+                </div>
+            </div>
+            
+            <div class="key-container" id="key-container">
+                <div class="key-icon" id="key-icon">🗝️</div>
+                <p class="instruction">Anahtarı kalbe götür</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ana Oyun Ekranı -->
+    <div id="main-screen" class="screen">
+        <div class="night-sky">
+            <div class="stars-container" id="stars-container"></div>
+            <div class="meteors-container" id="meteors-container"></div>
+        </div>
+        
+        <div class="main-content">
+            <h1 class="main-title">Sana olan aşkımı bul</h1>
+            <button class="ok-button" id="ok-button">Tamam</button>
+        </div>
+    </div>
+
+    <!-- Evren Keşfi Ekranı -->
+    <div id="universe-screen" class="screen">
+        <div class="universe-container" id="universe-container">
+            <div class="space-elements" id="space-elements"></div>
+            <div class="heart-universe" id="heart-universe"></div>
+        </div>
+        
+        <div class="zoom-instruction">
+            <p>Parmağınla gezin, yakınlaştırmak için iki parmağını birleştir</p>
+        </div>
+    </div>
+
+    <!-- Mesaj Ekranı -->
+    <div id="message-screen" class="screen">
+        <div class="message-container">
+            <h2 class="message-text" id="message-text">Sana olan aşkım evrene sığar mı ki?</h2>
+        </div>
+    </div>
+
+    <!-- Final Ekranı -->
+    <div id="final-screen" class="screen">
+        <div class="final-container">
+            <div class="final-stars"></div>
+            <h1 class="final-message">Seni seviyorum Rüya</h1>
+        </div>
+    </div>
+
+    <script defer src="js/touch-handler.js"></script>
+    <script defer src="js/animations.js"></script>
+    <script defer src="js/main.js"></script>
+</body>
+</html>
+
