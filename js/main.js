@@ -8,140 +8,61 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const keyIcon = document.getElementById('key-icon');
     const lockedHeart = document.getElementById('locked-heart');
+    const instructionText = document.querySelector('.instruction');
     const okButton = document.getElementById('ok-button');
 
     const universeContainer = document.getElementById('universe-container');
     const spaceElements = document.getElementById('space-elements');
     const heartUniverse = document.getElementById('heart-universe');
-    const messageText = document.getElementById('message-text');
+    const messageTextEl = document.getElementById('message-text');
     const finalMessage = document.querySelector('.final-message');
 
-    // --- State Variables ---
-    let isDragging = false;
+    // --- State ---
+    let isKeySelected = false;
     let isUnlocked = false;
-    let offsetX, offsetY;
 
-    // --- Core Functions ---
-
-    /**
-     * Transitions between screens with fade effects.
-     * @param {HTMLElement} fromScreen - The screen to hide.
-     * @param {HTMLElement} toScreen - The screen to show.
-     */
-    const transitionScreen = (fromScreen, toScreen) => {
-        fromScreen.classList.remove('active');
-        toScreen.classList.add('active');
+    // --- Screen Transition ---
+    const transitionScreen = (from, to) => {
+        from.classList.remove('active');
+        to.classList.add('active');
     };
 
-    /**
-     * Initializes the drag-and-drop functionality for the key.
-     */
-    const startDrag = (e) => {
+    // --- Intro Logic ---
+    const selectKey = () => {
         if (isUnlocked) return;
-        isDragging = true;
-        
-        keyIcon.style.position = 'fixed';
-        keyIcon.style.cursor = 'grabbing';
-        keyIcon.style.zIndex = '1001';
-
-        const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-        const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
-        
-        const rect = keyIcon.getBoundingClientRect();
-        offsetX = clientX - rect.left;
-        offsetY = clientY - rect.top;
-
-        document.addEventListener('mousemove', dragKey);
-        document.addEventListener('touchmove', dragKey, { passive: false });
-        document.addEventListener('mouseup', stopDrag);
-        document.addEventListener('touchend', stopDrag);
+        isKeySelected = true;
+        keyIcon.classList.add('selected');
+        instructionText.textContent = 'Kalbe dokunarak kilidi aç';
     };
 
-    /**
-     * Handles the movement of the key during dragging.
-     */
-    const dragKey = (e) => {
-        if (!isDragging) return;
-        e.preventDefault();
-
-        const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-        const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
-
-        keyIcon.style.left = `${clientX - offsetX}px`;
-        keyIcon.style.top = `${clientY - offsetY}px`;
-
-        checkCollision();
-    };
-
-    /**
-     * Ends the dragging process and cleans up event listeners.
-     */
-    const stopDrag = () => {
-        if (!isDragging) return;
-        isDragging = false;
-        keyIcon.style.cursor = 'grab';
-
-        if (!isUnlocked) {
-            keyIcon.style.position = 'relative';
-            keyIcon.style.left = 'auto';
-            keyIcon.style.top = 'auto';
-        }
-        
-        document.removeEventListener('mousemove', dragKey);
-        document.removeEventListener('touchmove', dragKey);
-        document.removeEventListener('mouseup', stopDrag);
-        document.removeEventListener('touchend', stopDrag);
-    };
-
-    /**
-     * Checks if the key is colliding with the heart.
-     */
-    const checkCollision = () => {
-        const keyRect = keyIcon.getBoundingClientRect();
-        const heartRect = lockedHeart.getBoundingClientRect();
-
-        if (keyRect.left < heartRect.right &&
-            keyRect.right > heartRect.left &&
-            keyRect.top < heartRect.bottom &&
-            keyRect.bottom > heartRect.top) {
-            unlockHeart();
-        }
-    };
-
-    /**
-     * Handles the unlocking animation and screen transition.
-     */
     const unlockHeart = () => {
-        if (isUnlocked) return;
+        if (isUnlocked || !isKeySelected) return;
         isUnlocked = true;
-        isDragging = false;
 
         lockedHeart.classList.add('unlocked');
-        keyIcon.style.opacity = '0';
+        keyIcon.style.opacity = '0'; // Hide the key
+        instructionText.style.opacity = '0'; // Hide the instruction
 
         setTimeout(() => {
             transitionScreen(introScreen, mainScreen);
-        }, 1200);
+        }, 1500); // Wait for unlock animation
     };
     
-    /**
-     * Initializes the universe exploration screen.
-     */
+    // --- Universe Logic ---
     const initUniverse = () => {
-        let scale = 1;
-        let panX = 0, panY = 0;
+        let scale = 1, panX = 0, panY = 0;
         let isPanning = false, lastPanX, lastPanY;
         let lastTouchDistance = 0;
         let heartRevealed = false;
         
-        spaceElements.innerHTML = '';
+        spaceElements.innerHTML = ''; // Clear previous stars
         for (let i = 0; i < 200; i++) {
             const star = document.createElement('div');
             star.className = 'space-element star';
             const size = Math.random() * 3 + 1;
             star.style.width = `${size}px`;
             star.style.height = `${size}px`;
-            star.style.left = `${Math.random() * 150 - 25}%`; // Spread stars wider
+            star.style.left = `${Math.random() * 150 - 25}%`;
             star.style.top = `${Math.random() * 150 - 25}%`;
             spaceElements.appendChild(star);
         }
@@ -168,30 +89,12 @@ document.addEventListener('DOMContentLoaded', () => {
             updateTransform();
         };
 
-        const stopPan = () => {
-            isPanning = false;
-            universeContainer.style.cursor = 'grab';
-        };
+        const stopPan = () => { isPanning = false; universeContainer.style.cursor = 'grab'; };
 
         const handleZoom = (e) => {
-            e.preventDefault();
-            scale += e.deltaY * -0.001; // For mouse wheel
+            scale += e.deltaY * -0.001;
             scale = Math.min(Math.max(0.1, scale), 2);
             updateTransform();
-            if (scale < 0.25 && !heartRevealed) revealHeart();
-        };
-
-        const handleTouchZoom = (e) => {
-            if (e.touches.length !== 2) return;
-            const currentDistance = Math.hypot(
-                e.touches[0].clientX - e.touches[1].clientX,
-                e.touches[0].clientY - e.touches[1].clientY
-            );
-            const scaleChange = currentDistance / lastTouchDistance;
-            scale *= scaleChange;
-            scale = Math.min(Math.max(0.1, scale), 2);
-            updateTransform();
-            lastTouchDistance = currentDistance;
             if (scale < 0.25 && !heartRevealed) revealHeart();
         };
 
@@ -199,57 +102,54 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.touches.length === 1) startPan(e);
             else if (e.touches.length === 2) {
                 isPanning = false;
-                lastTouchDistance = Math.hypot(
-                    e.touches[0].clientX - e.touches[1].clientX,
-                    e.touches[0].clientY - e.touches[1].clientY
-                );
+                lastTouchDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+            }
+        };
+
+        const touchMove = (e) => {
+            if (e.touches.length === 1 && isPanning) movePan(e);
+            else if (e.touches.length === 2) {
+                const currentDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                scale *= currentDistance / lastTouchDistance;
+                scale = Math.min(Math.max(0.1, scale), 2);
+                updateTransform();
+                lastTouchDistance = currentDistance;
+                if (scale < 0.25 && !heartRevealed) revealHeart();
             }
         };
 
         const revealHeart = () => {
             heartRevealed = true;
             heartUniverse.classList.add('visible');
-
-            // Start the final sequence
             setTimeout(() => {
                 transitionScreen(universeScreen, messageScreen);
-                
-                // After message is shown, trigger explosion and final screen
                 setTimeout(() => {
                     const explosion = document.createElement('div');
                     explosion.className = 'explosion';
                     messageScreen.appendChild(explosion);
-
                     setTimeout(() => {
                         finalMessage.textContent = 'Seni seviyorum Rüya';
                         transitionScreen(messageScreen, finalScreen);
-                        explosion.remove(); // Clean up the explosion element
-                    }, 1000); // Wait for explosion animation
-
-                }, 2500); // Time for user to read the message
-
-            }, 2000); // Time for user to see the heart universe
+                        explosion.remove();
+                    }, 1000);
+                }, 2500);
+            }, 2000);
         };
-        
-        // --- Universe Event Listeners ---
+
+        // Add universe event listeners
         universeContainer.addEventListener('mousedown', startPan);
         universeContainer.addEventListener('mousemove', movePan);
         universeContainer.addEventListener('mouseup', stopPan);
         universeContainer.addEventListener('mouseleave', stopPan);
         universeContainer.addEventListener('wheel', handleZoom, { passive: false });
         universeContainer.addEventListener('touchstart', touchStart, { passive: false });
-        universeContainer.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            if (e.touches.length === 1 && isPanning) movePan(e);
-            else if (e.touches.length === 2) handleTouchZoom(e);
-        }, { passive: false });
+        universeContainer.addEventListener('touchmove', touchMove, { passive: false });
         universeContainer.addEventListener('touchend', stopPan);
     };
 
     // --- Initial Event Listeners ---
-    keyIcon.addEventListener('mousedown', startDrag);
-    keyIcon.addEventListener('touchstart', startDrag, { passive: false });
-
+    keyIcon.addEventListener('click', selectKey);
+    lockedHeart.addEventListener('click', unlockHeart);
     okButton.addEventListener('click', () => {
         transitionScreen(mainScreen, universeScreen);
         initUniverse();
