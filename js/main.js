@@ -40,16 +40,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isUnlocked) return;
         isDragging = true;
         
-        keyIcon.style.position = 'fixed';
-        keyIcon.style.cursor = 'grabbing';
-        keyIcon.style.zIndex = '1001';
-
         const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
         const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
         
+        // Önce elementin mevcut pozisyonunu al
         const rect = keyIcon.getBoundingClientRect();
+        
+        // Offset hesapla (mouse pozisyonu - element pozisyonu)
         offsetX = clientX - rect.left;
         offsetY = clientY - rect.top;
+        
+        // Şimdi pozisyonu fixed yap ve mevcut konuma yerleştir
+        keyIcon.style.position = 'fixed';
+        keyIcon.style.left = `${rect.left}px`;
+        keyIcon.style.top = `${rect.top}px`;
+        keyIcon.style.cursor = 'grabbing';
+        keyIcon.style.zIndex = '1001';
 
         document.addEventListener('mousemove', dragKey);
         document.addEventListener('touchmove', dragKey, { passive: false });
