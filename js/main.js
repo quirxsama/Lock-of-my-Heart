@@ -1,81 +1,129 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const key = document.getElementById('key-icon');
-    const lockedHeart = document.getElementById('locked-heart');
+    // Screen elements
     const introScreen = document.getElementById('intro-screen');
     const mainScreen = document.getElementById('main-screen');
     const universeScreen = document.getElementById('universe-screen');
     const messageScreen = document.getElementById('message-screen');
     const finalScreen = document.getElementById('final-screen');
+
+    // Intro screen elements
+    const keyIcon = document.getElementById('key-icon');
+    const lockedHeart = document.getElementById('locked-heart');
+
+    // Button elements
     const okButton = document.getElementById('ok-button');
+
+    // Universe elements
     const universeContainer = document.getElementById('universe-container');
     const spaceElements = document.getElementById('space-elements');
-
+    const heartUniverse = document.getElementById('heart-universe');
+    
     let isDragging = false;
     let offsetX, offsetY;
+    let isUnlocked = false;
 
-    const moveKey = (e) => {
-        if (!isDragging) return;
-        const x = e.clientX || e.touches[0].clientX;
-        const y = e.clientY || e.touches[0].clientY;
-        key.style.left = `${x - offsetX}px`;
-        key.style.top = `${y - offsetY}px`;
-        checkCollision();
-    };
+    // --- Drag and Drop Logic ---
 
     const startDrag = (e) => {
+        if (isUnlocked) return;
         isDragging = true;
-        key.style.position = 'absolute';
-        key.style.zIndex = '1000';
-        key.style.cursor = 'grabbing';
-        const rect = key.getBoundingClientRect();
-        const clientX = e.clientX || e.touches[0].clientX;
-        const clientY = e.clientY || e.touches[0].clientY;
+
+        keyIcon.style.position = 'absolute';
+        keyIcon.style.cursor = 'grabbing';
+        
+        // Use pageX/pageY for consistency across browsers and devices
+        const clientX = e.clientX || e.touches[0].pageX;
+        const clientY = e.clientY || e.touches[0].pageY;
+
+        const rect = keyIcon.getBoundingClientRect();
         offsetX = clientX - rect.left;
         offsetY = clientY - rect.top;
-        document.addEventListener('mousemove', moveKey);
-        document.addEventListener('touchmove', moveKey, { passive: false });
+
+        // Add listeners to the whole document to allow dragging outside the initial element
+        document.addEventListener('mousemove', dragKey);
+        document.addEventListener('touchmove', dragKey, { passive: false });
+        document.addEventListener('mouseup', stopDrag);
+        document.addEventListener('touchend', stopDrag);
+    };
+
+    const dragKey = (e) => {
+        if (!isDragging) return;
+        e.preventDefault(); // Prevent scrolling on touch devices
+
+        const clientX = e.clientX || e.touches[0].pageX;
+        const clientY = e.clientY || e.touches[0].pageY;
+
+        keyIcon.style.left = `${clientX - offsetX}px`;
+        keyIcon.style.top = `${clientY - offsetY}px`;
+
+        checkCollision();
     };
 
     const stopDrag = () => {
         if (!isDragging) return;
         isDragging = false;
-        key.style.cursor = 'grab';
-        document.removeEventListener('mousemove', moveKey);
-        document.removeEventListener('touchmove', moveKey);
+        keyIcon.style.cursor = 'grab';
+
+        // Reset position if not unlocked
+        if (!isUnlocked) {
+            keyIcon.style.position = 'relative';
+            keyIcon.style.left = 'auto';
+            keyIcon.style.top = 'auto';
+        }
+        
+        document.removeEventListener('mousemove', dragKey);
+        document.removeEventListener('touchmove', dragKey);
+        document.removeEventListener('mouseup', stopDrag);
+        document.removeEventListener('touchend', stopDrag);
     };
 
     const checkCollision = () => {
-        const keyRect = key.getBoundingClientRect();
+        const keyRect = keyIcon.getBoundingClientRect();
         const heartRect = lockedHeart.getBoundingClientRect();
-        const isColliding = !(keyRect.right < heartRect.left || keyRect.left > heartRect.right || keyRect.bottom < heartRect.top || keyRect.top > heartRect.bottom);
+
+        const isColliding = !(
+            keyRect.right < heartRect.left ||
+            keyRect.left > heartRect.right ||
+            keyRect.bottom < heartRect.top ||
+            keyRect.top > heartRect.bottom
+        );
+
         if (isColliding) {
             unlockHeart();
         }
     };
 
     const unlockHeart = () => {
-        if (lockedHeart.classList.contains('unlocked')) return;
-        isDragging = false;
+        if (isUnlocked) return;
+        isUnlocked = true;
+        isDragging = false; // Stop dragging logic
+
         lockedHeart.classList.add('unlocked');
-        key.style.transition = 'opacity 0.5s, transform 0.5s';
-        key.style.opacity = '0';
-        key.style.transform = 'scale(0)';
+        
+        keyIcon.style.transition = 'opacity 0.5s, transform 0.5s';
+        keyIcon.style.opacity = '0';
+        keyIcon.style.transform = 'scale(0)';
+
+        // Transition to next screen after animation
         setTimeout(() => {
             introScreen.classList.remove('active');
             mainScreen.classList.add('active');
-        }, 1200);
+        }, 1500); // Wait for heart unlock animation
     };
 
-    key.addEventListener('mousedown', startDrag);
-    key.addEventListener('touchstart', startDrag, { passive: false });
-    document.addEventListener('mouseup', stopDrag);
-    document.addEventListener('touchend', stopDrag);
+    keyIcon.addEventListener('mousedown', startDrag);
+    keyIcon.addEventListener('touchstart', startDrag, { passive: false });
 
+
+    // --- Screen Navigation ---
+    
     okButton.addEventListener('click', () => {
         mainScreen.classList.remove('active');
         universeScreen.classList.add('active');
         initUniverse();
     });
+    
+    // --- Universe Logic ---
 
     const initUniverse = () => {
         let scale = 1;
@@ -86,7 +134,11 @@ document.addEventListener('DOMContentLoaded', () => {
         let lastTouchDistance = 0;
         let heartRevealed = false;
 
-        const createSpaceElement = () => {
+        // Clear previous elements if any
+        spaceElements.innerHTML = '';
+        
+        // Create stars
+        for (let i = 0; i < 200; i++) {
             const element = document.createElement('div');
             element.className = 'space-element star';
             const size = Math.random() * 3 + 1;
@@ -95,10 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
             element.style.left = `${Math.random() * 200 - 50}%`;
             element.style.top = `${Math.random() * 200 - 50}%`;
             spaceElements.appendChild(element);
-        };
-
-        for (let i = 0; i < 200; i++) {
-            createSpaceElement();
         }
 
         const updateTransform = () => {
@@ -148,6 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.touches.length === 1) {
                 startPan(e);
             } else if (e.touches.length === 2) {
+                isPanning = false;
                 lastTouchDistance = getTouchDistance(e.touches);
             }
         };
@@ -171,19 +220,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const revealHeart = () => {
             heartRevealed = true;
-            document.getElementById('heart-universe').classList.add('visible');
+            heartUniverse.classList.add('visible');
+            
             setTimeout(() => {
                 universeScreen.classList.remove('active');
                 messageScreen.classList.add('active');
+                
                 setTimeout(() => {
-                    const messageText = document.getElementById('message-text');
-                    messageText.textContent = "Seni seviyorum Rüya";
                     messageScreen.classList.remove('active');
                     finalScreen.classList.add('active');
+                    document.getElementById('message-text').textContent = "Seni seviyorum Rüya";
                 }, 4000);
+
             }, 3000);
         };
 
+        // Add universe event listeners
         universeContainer.addEventListener('mousedown', startPan);
         universeContainer.addEventListener('mousemove', movePan);
         universeContainer.addEventListener('mouseup', stopPan);

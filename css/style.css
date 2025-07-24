@@ -38,13 +38,14 @@ body {
     justify-content: center;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.8s ease-in-out, visibility 0.8s;
+    transition: opacity 0.8s ease-in-out, visibility 0s 0.8s;
     z-index: 1;
 }
 
 .screen.active {
     opacity: 1;
     visibility: visible;
+    transition-delay: 0s;
     z-index: 10;
 }
 
@@ -67,7 +68,6 @@ body {
 .locked-heart {
     position: relative;
     margin-bottom: 100px;
-    cursor: pointer;
 }
 
 .heart-shape {
@@ -75,7 +75,7 @@ body {
     font-size: 150px;
     color: #e74c3c;
     text-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
-    transition: transform 0.4s ease;
+    transition: transform 0.4s ease, text-shadow 0.4s ease;
 }
 
 .lock-icon {
@@ -86,30 +86,35 @@ body {
     font-size: 50px;
     color: #fff;
     text-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    transition: all 0.4s ease;
 }
 
-.chains {
-    position: absolute;
-    bottom: -60px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 15px;
+.lock-icon .unlock {
+    display: none;
+    color: #ffd700;
 }
 
-.chain {
-    width: 8px;
-    height: 80px;
-    background: #34495e;
-    border-radius: 4px;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+.locked-heart.unlocked .lock-icon .lock {
+    display: none;
 }
+
+.locked-heart.unlocked .lock-icon .unlock {
+    display: inline-block;
+    animation: unlock-pop 0.6s ease-out;
+}
+
+@keyframes unlock-pop {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { transform: scale(1.2) rotate(-10deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
 
 .key-container {
-    text-align: center;
     position: absolute;
     bottom: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
 }
 
 .key-icon {
@@ -118,6 +123,9 @@ body {
     cursor: grab;
     transition: transform 0.3s ease;
     filter: drop-shadow(0 5px 15px rgba(255, 215, 0, 0.5));
+    /* Added for positioning context */
+    display: inline-block;
+    position: relative;
 }
 
 .key-icon:active {
