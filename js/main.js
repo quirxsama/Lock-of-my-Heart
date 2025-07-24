@@ -31,9 +31,9 @@ document.addEventListener('DOMContentLoaded', () => {
         keyIcon.style.position = 'absolute';
         keyIcon.style.cursor = 'grabbing';
         
-        // Use pageX/pageY for consistency across browsers and devices
-        const clientX = e.clientX || e.touches[0].pageX;
-        const clientY = e.clientY || e.touches[0].pageY;
+        // Consistently use clientX/Y for both mouse and touch events
+        const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+        const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
 
         const rect = keyIcon.getBoundingClientRect();
         offsetX = clientX - rect.left;
@@ -50,13 +50,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isDragging) return;
         e.preventDefault(); // Prevent scrolling on touch devices
 
-        const clientX = e.clientX || e.touches[0].pageX;
-        const clientY = e.clientY || e.touches[0].pageY;
+        // Consistently use clientX/Y for both mouse and touch events
+        const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+        const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
 
-        keyIcon.style.left = `${clientX - offsetX}px`;
-        keyIcon.style.top = `${clientY - offsetY}px`;
-
-        checkCollision();
+        // Check if clientX/Y are valid numbers before applying
+        if (typeof clientX === 'number' && typeof clientY === 'number') {
+            keyIcon.style.left = `${clientX - offsetX}px`;
+            keyIcon.style.top = `${clientY - offsetY}px`;
+            checkCollision();
+        }
     };
 
     const stopDrag = () => {
@@ -156,14 +159,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const startPan = (e) => {
             isPanning = true;
             universeContainer.style.cursor = 'grabbing';
-            lastPanX = e.clientX || e.touches[0].clientX;
-            lastPanY = e.clientY || e.touches[0].clientY;
+            lastPanX = e.touches ? e.touches[0].clientX : e.clientX;
+            lastPanY = e.touches ? e.touches[0].clientY : e.clientY;
         };
 
         const movePan = (e) => {
             if (!isPanning) return;
-            const clientX = e.clientX || e.touches[0].clientX;
-            const clientY = e.clientY || e.touches[0].clientY;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             panX += clientX - lastPanX;
             panY += clientY - lastPanY;
             lastPanX = clientX;
