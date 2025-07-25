@@ -30,8 +30,13 @@
     
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/galaxy.css">
 </head>
 <body>
+    <!-- Arkaplan Müziği -->
+    <audio id="background-music" loop>
+        <source src="assets/music/background.mp3" type="audio/mp3">
+    </audio>
     <!-- Giriş Ekranı - Anahtar ve Kilit -->
     <div id="intro-screen" class="screen active">
         <div class="intro-container">
@@ -47,7 +52,7 @@
             
             <div class="key-container" id="key-container">
                 <div class="key-icon" id="key-icon"><i class="fas fa-key"></i></div>
-                <p class="instruction">Anahtarı kalbe götür</p>
+                <p class="instruction">Anahtarı kalbe götür (Anahtara Dokun)</p>
             </div>
         </div>
     </div>
@@ -69,11 +74,18 @@
     <div id="universe-screen" class="screen">
         <div class="universe-container" id="universe-container">
             <div class="space-elements" id="space-elements"></div>
-            <div class="heart-universe" id="heart-universe"></div>
         </div>
         
         <div class="zoom-instruction">
             <p>Parmağınla gezin, yakınlaştırmak için iki parmağını birleştir</p>
+        </div>
+        <div class="sound-control">
+            <button class="sound-button" id="sound-button">
+                <i class="fas fa-volume-low"></i>
+            </button>
+            <div class="volume-slider-container">
+                <input type="range" class="volume-slider" id="volume-slider" min="0" max="100" value="1">
+            </div>
         </div>
     </div>
 

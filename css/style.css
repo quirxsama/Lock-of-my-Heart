@@ -66,6 +66,7 @@ body {
     position: relative;
     margin-bottom: 100px;
     cursor: pointer;
+    transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 .heart-shape {
@@ -73,7 +74,17 @@ body {
     font-size: 150px;
     color: #e74c3c;
     text-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
-    transition: transform 0.4s ease, text-shadow 0.4s ease;
+    transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.locked-heart:hover .heart-shape {
+    transform: scale(1.1);
+    text-shadow: 0 15px 40px rgba(231, 76, 60, 0.6);
+}
+
+.locked-heart.unlocked .heart-shape {
+    animation: unlockedHeartPulse 1.5s ease-in-out infinite;
+    color: #ff6b6b;
 }
 
 .lock-icon {
@@ -97,13 +108,58 @@ body {
 
 .locked-heart.unlocked .lock-icon .unlock {
     display: inline-block;
-    animation: unlock-pop 0.6s ease-out;
+    animation: unlock-pop 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 @keyframes unlock-pop {
-    0% { transform: scale(0.5); opacity: 0; }
-    50% { transform: scale(1.2) rotate(-10deg); opacity: 1; }
-    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    0% { 
+        transform: scale(0.5) rotate(0deg); 
+        opacity: 0;
+        filter: brightness(1);
+    }
+    30% { 
+        transform: scale(1.4) rotate(-15deg); 
+        opacity: 1;
+        filter: brightness(2);
+    }
+    60% { 
+        transform: scale(1.2) rotate(10deg); 
+        filter: brightness(1.5);
+    }
+    80% { 
+        transform: scale(1.1) rotate(-5deg); 
+        filter: brightness(1.2);
+    }
+    100% { 
+        transform: scale(1) rotate(0deg); 
+        filter: brightness(1);
+    }
+}
+
+.locked-heart.unlocked::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, rgba(255,215,0,1) 0%, rgba(255,215,0,0) 70%);
+    transform: translate(-50%, -50%);
+    animation: unlockBurst 1s ease-out forwards;
+    z-index: -1;
+}
+
+@keyframes unlockBurst {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    100% {
+        width: 300px;
+        height: 300px;
+        opacity: 0;
+    }
 }
 
 
@@ -189,68 +245,187 @@ body {
 /* Evren Ekranı */
 #universe-screen {
     background: #000;
+    overflow: hidden;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
 }
 
 .universe-container {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
     cursor: grab;
+    background: #0a0a0a;
+    z-index: 1;
+    overflow: hidden;
+    touch-action: none;
 }
 
 #space-elements {
     position: absolute;
-    width: 100%;
-    height: 100%;
-    transform-origin: center;
-    will-change: transform;
-}
-
-.space-element.star {
-    position: absolute;
-    background: white;
-    border-radius: 50%;
-    animation: twinkle 4s ease-in-out infinite alternate;
-}
-
-#heart-universe {
-    position: absolute;
+    width: 300vw;
+    height: 300vh;
     top: 50%;
     left: 50%;
-    width: 500px;
-    height: 500px;
     transform: translate(-50%, -50%);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 2s ease-in-out 1s;
+    transform-origin: center;
+    will-change: transform;
+    z-index: 4;
+    pointer-events: auto;
 }
 
-#heart-universe.visible {
+.star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #fff;
+    border-radius: 50%;
+    z-index: 1;
+    transition: all 2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 4px #fff;
+    opacity: 0;
+    will-change: transform, opacity;
+}
+
+.star.active {
+    opacity: 1;
+    animation: starPulse 2s infinite alternate;
+}
+
+@keyframes starPulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 4px #fff;
+    }
+    50% {
+        transform: scale(1.5);
+        box-shadow: 0 0 8px #fff, 0 0 12px rgba(255, 255, 255, 0.5);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 4px #fff;
+    }
+}
+
+.star.collected {
+    transition: all 2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.star.shine {
+    animation: starShine 2s infinite alternate;
+}
+
+@keyframes starShine {
+    0% { 
+        opacity: 0.4;
+        transform: scale(1);
+        filter: blur(0px);
+    }
+    50% { 
+        opacity: 1;
+        transform: scale(1.5);
+        filter: blur(1px);
+    }
+    100% { 
+        opacity: 0.4;
+        transform: scale(1);
+        filter: blur(0px);
+    }
+}
+
+.star.medium {
+    width: 3px;
+    height: 3px;
+    background: #ffd;
+    box-shadow: 0 0 3px #ffd;
+}
+
+.star.large {
+    width: 4px;
+    height: 4px;
+    background: #ffa;
+    box-shadow: 0 0 4px #ffa;
+}
+
+@keyframes twinkle {
+    0% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.center-heart {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, 
+        rgba(255, 0, 0, 1) 0%,
+        rgba(255, 50, 50, 0.8) 30%,
+        rgba(255, 100, 100, 0.5) 60%,
+        transparent 80%
+    );
+    border-radius: 50%;
+    opacity: 0;
+    filter: blur(5px);
+    transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2;
+}
+
+.center-heart.appear {
+    width: 200px;
+    height: 200px;
     opacity: 1;
 }
 
-#heart-universe::before,
-#heart-universe::after {
+.center-heart.expand {
+    width: 4000px;
+    height: 4000px;
+    opacity: 0;
+}
+
+.final-heart {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: #ff0000;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    z-index: 3;
+    filter: drop-shadow(0 0 20px rgba(255, 0, 0, 0.8));
+}
+
+.final-heart.show {
+    width: 100px;
+    height: 100px;
+    opacity: 1;
+}
+
+.final-heart::before,
+.final-heart::after {
     content: '';
     position: absolute;
+    width: 100px;
+    height: 100px;
+    background: #ff0000;
+    border-radius: 50%;
+    box-shadow: 0 0 40px rgba(255, 0, 0, 0.8);
+}
+
+.final-heart::before {
+    top: -50px;
+    left: 0;
+}
+
+.final-heart::after {
     top: 0;
-    width: 250px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(255, 107, 107, 0.5) 0%, rgba(231, 76, 60, 0.2) 40%, transparent 70%);
-    border-radius: 250px 250px 0 0;
-    transform-origin: bottom center;
-    filter: blur(5px);
-}
-
-#heart-universe::before {
-    left: 125px;
-    transform: rotate(-45deg);
-}
-
-#heart-universe::after {
-    left: -125px;
-    transform: rotate(45deg);
+    left: 50px;
 }
 
 
@@ -271,6 +446,99 @@ body {
     border-radius: 20px;
 }
 
+.sound-control {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 10px;
+    border-radius: 30px;
+    backdrop-filter: blur(5px);
+}
+
+.sound-button {
+    background: rgba(255, 107, 107, 0.2);
+    border: 2px solid rgba(255, 107, 107, 0.4);
+    color: rgba(255, 255, 255, 0.8);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.sound-button:hover {
+    background: rgba(255, 107, 107, 0.3);
+    border-color: rgba(255, 107, 107, 0.6);
+    transform: scale(1.1);
+}
+
+.sound-button.muted i::before {
+    content: "\\f6a9";  /* fa-volume-xmark */
+}
+
+.volume-slider-container {
+    width: 100px;
+    padding: 0 10px;
+    display: none;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.sound-control:hover .volume-slider-container {
+    display: block;
+    opacity: 1;
+}
+
+.volume-slider {
+    width: 100%;
+    height: 4px;
+    -webkit-appearance: none;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    outline: none;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    background: rgba(255, 107, 107, 0.8);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.volume-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: rgba(255, 107, 107, 0.8);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    background: rgba(255, 107, 107, 1);
+}
+
+.volume-slider::-moz-range-thumb:hover {
+    transform: scale(1.2);
+    background: rgba(255, 107, 107, 1);
+}
+
 /* Mesaj Ekranı */
 #message-screen {
     background: linear-gradient(45deg, #1a1a2e, #16213e);
@@ -285,7 +553,28 @@ body {
     font-size: 42px;
     font-weight: 600;
     text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-    animation: pulse 2.5s infinite;
+    opacity: 0;
+    transform: scale(0.5);
+    filter: blur(10px);
+    animation: messageAppear 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes messageAppear {
+    0% {
+        opacity: 0;
+        transform: scale(0.5) translateY(50px);
+        filter: blur(10px);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.1) translateY(-10px);
+        filter: blur(5px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: blur(0);
+    }
 }
 
 /* Final Ekranı */
@@ -316,10 +605,10 @@ body {
     .heart-shape { font-size: 120px; }
     .lock-icon { font-size: 40px; }
     .key-icon { font-size: 60px; }
-    #heart-universe { width: 300px; height: 300px; }
-    #heart-universe::before, #heart-universe::after { width: 150px; height: 240px; }
-    #heart-universe::before { left: 75px; }
-    #heart-universe::after { left: -75px; }
+    #heart-universe { width: 600px; height: 600px; }
+    #heart-universe::before, #heart-universe::after { width: 300px; height: 480px; }
+    #heart-universe::before { left: 150px; }
+    #heart-universe::after { left: -150px; }
 
 }
 
@@ -336,7 +625,106 @@ body {
     50% { transform: scale(1.05); opacity: 1; }
 }
 
+.sparkle {
+    position: absolute;
+    width: 2px;
+    height: 20px;
+    background: #ffd700;
+    border-radius: 2px;
+    opacity: 0;
+    transform-origin: center 0;
+    animation: sparkleOut 0.8s ease-out forwards;
+}
+
+@keyframes sparkleOut {
+    0% {
+        transform: rotate(var(--rotation)) translateY(0) scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: rotate(var(--rotation)) translateY(60px) scale(1);
+        opacity: 0;
+    }
+}
+
+.explosion {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(255,215,0,0.8) 0%, rgba(255,215,0,0) 70%);
+    border-radius: 50%;
+    animation: explode 1.5s ease-out forwards;
+    animation-delay: var(--delay, 0s);
+    transform: scale(0);
+}
+
 @keyframes finalGlow {
     from { text-shadow: 0 0 30px rgba(255, 107, 107, 0.7); }
     to { text-shadow: 0 0 50px rgba(255, 107, 107, 1), 0 0 80px rgba(255, 107, 107, 0.5); }
+}
+
+@keyframes heartbeat {
+    0% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.05); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes explode {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(2);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(3);
+        opacity: 0;
+    }
+}
+
+@keyframes cosmicPulse {
+    0% {
+        filter: blur(2px) brightness(1);
+        box-shadow: 
+            inset 0 0 100px rgba(255, 255, 255, 0.8),
+            inset 0 0 200px rgba(255, 0, 0, 0.8),
+            0 0 100px rgba(255, 0, 0, 0.8),
+            0 0 200px rgba(255, 0, 0, 0.4);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+    50% {
+        filter: blur(3px) brightness(1.3);
+        box-shadow: 
+            inset 0 0 150px rgba(255, 255, 255, 0.9),
+            inset 0 0 300px rgba(255, 0, 0, 0.9),
+            0 0 200px rgba(255, 0, 0, 0.9),
+            0 0 400px rgba(255, 0, 0, 0.5);
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+    100% {
+        filter: blur(2px) brightness(1.5);
+        box-shadow: 
+            inset 0 0 200px rgba(255, 255, 255, 1),
+            inset 0 0 400px rgba(255, 0, 0, 1),
+            0 0 300px rgba(255, 0, 0, 1),
+            0 0 600px rgba(255, 0, 0, 0.6);
+        border-color: rgba(255, 255, 255, 0.7);
+    }
+}
+
+@keyframes unlockedHeartPulse {
+    0% {
+        transform: scale(1);
+        text-shadow: 0 0 30px rgba(255, 107, 107, 0.8);
+    }
+    50% {
+        transform: scale(1.2);
+        text-shadow: 0 0 50px rgba(255, 107, 107, 1);
+    }
+    100% {
+        transform: scale(1);
+        text-shadow: 0 0 30px rgba(255, 107, 107, 0.8);
+    }
 }

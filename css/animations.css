@@ -144,31 +144,7 @@
     }
 }
 
-/* Patlama Efekti */
-.explosion {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: radial-gradient(circle, #fff 0%, #ff6b6b 30%, #ee5a24 60%, transparent 100%);
-    animation: explode 1.5s ease-out forwards;
-}
 
-@keyframes explode {
-    from {
-        width: 0;
-        height: 0;
-        opacity: 1;
-    }
-    to {
-        width: 800px;
-        height: 800px;
-        opacity: 0;
-    }
-}
 
 /* Ekran Geçiş Animasyonları */
 .screen.active {

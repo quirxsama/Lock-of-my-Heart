@@ -1,0 +1,91 @@
+.background-canvas, .star-canvas, .particle-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    will-change: transform;
+}
+
+.background-canvas {
+    z-index: 1;
+}
+
+.star-canvas {
+    z-index: 2;
+}
+
+.particle-canvas {
+    z-index: 3;
+}
+
+.heart-counter {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 18px;
+    z-index: 100;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.heart-piece {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    z-index: 20;
+    pointer-events: auto;
+}
+
+.heart-piece::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 0, 100, 0.8);
+    clip-path: path('M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2c6.1-9.3,16-12.1,16-21.2C32,3.8,28.2,0,23.6,0z');
+    animation: pulse 2s infinite;
+}
+
+.heart-piece-glow {
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    background: radial-gradient(circle, rgba(255, 0, 100, 0.2) 0%, rgba(255, 0, 100, 0) 70%);
+    animation: rotate 4s linear infinite;
+}
+
+.heart-piece.collected {
+    animation: collect 0.5s forwards;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes collect {
+    0% { 
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    100% { 
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+}
