@@ -1,7 +1,7 @@
 {
-  "name": "Sana Olan Aşkım",
-  "short_name": "Aşk Oyunu",
-  "description": "Romantik ve cute bir web oyunu",
+  "name": "Lock of my Heart",
+  "short_name": "My Love",
+  "description": "Lock of my Heart",
   "start_url": "/",
   "display": "fullscreen",
   "orientation": "portrait",
